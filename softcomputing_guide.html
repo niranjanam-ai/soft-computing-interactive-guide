@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soft Computing Lab – Beginner's Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
+
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --card: #1a1e2a;
+    --border: #262b38;
+    --accent1: #5e9bff;
+    --accent2: #ff6b6b;
+    --accent3: #56e39f;
+    --accent4: #f7b731;
+    --accent5: #c77dff;
+    --text: #e2e8f0;
+    --muted: #7a8499;
+    --tag-bg: #1e2435;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d0f14 0%, #13161e 50%, #0d1120 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -60px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 200px;
+    background: radial-gradient(ellipse, rgba(94,155,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--accent1), var(--accent5));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+  header p {
+    color: var(--muted);
+    margin-top: 8px;
+    font-size: 0.95rem;
+    font-weight: 300;
+  }
+  .badge-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-top: 20px;
+  }
+  .badge {
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    padding: 4px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .badge:hover, .badge.active {
+    border-color: var(--accent1);
+    color: var(--accent1);
+    background: rgba(94,155,255,0.08);
+  }
+
+  /* SEARCH */
+  .search-wrap {
+    max-width: 900px; margin: 28px auto 0; padding: 0 20px;
+  }
+  .search-wrap input {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: var(--text);
+    font-family: 'Lato', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-wrap input:focus { border-color: var(--accent1); }
+  .search-wrap input::placeholder { color: var(--muted); }
+
+  /* MAIN */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* CARD */
+  .exp-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .exp-card:hover { border-color: #333a4d; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.02); }
+
+  .exp-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .card-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.97rem;
+    font-weight: 700;
+    flex: 1;
+    letter-spacing: 0.2px;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    padding: 3px 9px;
+    border-radius: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .exp-card.open .chevron { transform: rotate(180deg); }
+
+  /* BODY */
+  .card-body {
+    display: none;
+    padding: 0 22px 22px;
+    border-top: 1px solid var(--border);
+  }
+  .exp-card.open .card-body { display: block; }
+
+  /* SECTIONS */
+  .section {
+    margin-top: 18px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ANALOGY BOX */
+  .analogy-box {
+    background: rgba(94,155,255,0.06);
+    border: 1px solid rgba(94,155,255,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 0.92rem;
+  }
+  .analogy-box .emoji { font-size: 1.3rem; margin-right: 8px; }
+
+  /* FLOW */
+  .flow-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: flex;
+    gap: 14px;
+    position: relative;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 34px;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .step-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+    position: relative;
+    z-index: 1;
+  }
+  .step-content {
+    padding: 6px 0 18px;
+    font-size: 0.9rem;
+    color: #c8d0e0;
+  }
+  .step-content strong { color: var(--text); }
+
+  /* DIFF INPUT TABLE */
+  .diff-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.87rem;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .diff-table th {
+    background: rgba(255,255,255,0.04);
+    padding: 10px 14px;
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.74rem;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .diff-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: #c8d0e0;
+  }
+  .diff-table tr:last-child td { border-bottom: none; }
+  .diff-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .diff-table td:first-child {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--accent3);
+    white-space: nowrap;
+  }
+
+  /* KEY TERM */
+  .key-term {
+    background: rgba(247,183,49,0.07);
+    border-left: 3px solid var(--accent4);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: #d0b87a;
+    margin-top: 8px;
+  }
+  .key-term strong { color: var(--accent4); display: block; font-size: 0.75rem; margin-bottom: 4px; font-family: 'DM Mono', monospace; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* COLOR THEMES */
+  .c1 { background: rgba(94,155,255,0.12); color: var(--accent1); border-color: rgba(94,155,255,0.3); }
+  .c2 { background: rgba(255,107,107,0.12); color: var(--accent2); border-color: rgba(255,107,107,0.3); }
+  .c3 { background: rgba(86,227,159,0.12); color: var(--accent3); border-color: rgba(86,227,159,0.3); }
+  .c4 { background: rgba(247,183,49,0.12); color: var(--accent4); border-color: rgba(247,183,49,0.3); }
+  .c5 { background: rgba(199,125,255,0.12); color: var(--accent5); border-color: rgba(199,125,255,0.3); }
+
+  .dot1 { background: rgba(94,155,255,0.15); color: var(--accent1); border: 1px solid rgba(94,155,255,0.3); }
+  .dot2 { background: rgba(86,227,159,0.15); color: var(--accent3); border: 1px solid rgba(86,227,159,0.3); }
+  .dot3 { background: rgba(247,183,49,0.15); color: var(--accent4); border: 1px solid rgba(247,183,49,0.3); }
+  .dot4 { background: rgba(199,125,255,0.15); color: var(--accent5); border: 1px solid rgba(199,125,255,0.3); }
+  .dot5 { background: rgba(255,107,107,0.15); color: var(--accent2); border: 1px solid rgba(255,107,107,0.3); }
+
+  .no-results {
+    text-align: center;
+    color: var(--muted);
+    padding: 60px 20px;
+    font-size: 0.95rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🧠 Soft Computing Lab — Complete Guide</h1>
+  <p>Beginner-friendly explanations with program flow & different input scenarios</p>
+  <div class="badge-row">
+    <span class="badge active" onclick="filter('all',this)">All (21)</span>
+    <span class="badge" onclick="filter('perceptron',this)">Perceptron</span>
+    <span class="badge" onclick="filter('memory',this)">Memory</span>
+    <span class="badge" onclick="filter('fuzzy',this)">Fuzzy Logic</span>
+    <span class="badge" onclick="filter('network',this)">Networks</span>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="searchBox" placeholder="🔍  Search by experiment name or topic..." oninput="searchCards()">
+  </div>
+</header>
+
+<main id="mainContent">
+
+<!-- =========================================
+     EX 1 — AND GATE
+========================================= -->
+<div class="exp-card" data-tags="perceptron gate" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c1">EX 01</span>
+    <h2>Perceptron for AND Gate</h2>
+    <span class="tag c1">Perceptron</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🚦</span> Imagine a strict security gate that opens <strong>only when BOTH guards nod yes</strong>. If even one guard says no — the gate stays shut. That's AND.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Setup:</strong> Define all 4 input combinations: [0,0], [0,1], [1,0], [1,1]. Set target outputs y = [0,0,0,1] (only last row gives 1).</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Initialize:</strong> Weights = [0.0, 0.0], Bias = 0.0. Learning rate = 0.1. Think of weights as how much we "trust" each input.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Training Loop (10 times):</strong> For each input row → calculate weighted sum → pass through step function → compare with target → calculate error → update weights & bias.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Update Rule:</strong> new_weight = old_weight + 0.1 × error × input. If the guess was correct, error=0, nothing changes. If wrong, weights adjust.</div></div>
+        <div class="flow-step"><div class="step-dot dot5">5</div><div class="step-content"><strong>Testing:</strong> After 10 epochs, use final weights to predict all 4 rows. Print result.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input</th><th>What the program does</th><th>Output</th></tr>
+        <tr><td>[0, 0]</td><td>Weighted sum = 0+0+bias ≈ small negative. Step fn → 0</td><td>0 ✅</td></tr>
+        <tr><td>[0, 1]</td><td>Only second weight matters. Sum still below threshold</td><td>0 ✅</td></tr>
+        <tr><td>[1, 0]</td><td>Only first weight matters. Sum still below threshold</td><td>0 ✅</td></tr>
+        <tr><td>[1, 1]</td><td>Both weights contribute. Sum crosses threshold</td><td>1 ✅</td></tr>
+        <tr><td>Change y to [1,1,1,1]</td><td>Every combo has target=1. Weights grow large to always fire</td><td>Always 1</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"The perceptron learns by adjusting weights based on the error between predicted and actual output. For AND gate, only when both inputs are 1 does the weighted sum cross the threshold."</div>
+  </div>
+</div>
+
+<!-- EX 2 — OR GATE -->
+<div class="exp-card" data-tags="perceptron gate" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c2">EX 02</span>
+    <h2>Perceptron for OR Gate</h2>
+    <span class="tag c2">Perceptron</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🚪</span> A door that opens if <strong>at least one person</strong> has a key. Even if only one out of two has it — the door opens.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Only ONE thing is different from AND:</strong> Target y = [0, 1, 1, 1] — output is 1 when ANY input is 1.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Same training loop</strong> as AND. Weights adjust 10 times over all inputs.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Result:</strong> The learned weights will be higher than AND, making it easier to cross the threshold with just one active input.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>[0, 0]</td><td>No active inputs → sum too small</td><td>0 ✅</td></tr>
+        <tr><td>[0, 1] or [1, 0]</td><td>One weight contributes enough to cross threshold</td><td>1 ✅</td></tr>
+        <tr><td>[1, 1]</td><td>Both weights contribute → easily crosses threshold</td><td>1 ✅</td></tr>
+        <tr><td>Change y to [1,0,0,1]</td><td>Network learns XNOR-like pattern — not guaranteed to converge</td><td>May fail</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"OR and AND use the same perceptron code — only the target output array changes. The perceptron learns a different decision boundary for each gate."</div>
+  </div>
+</div>
+
+<!-- EX 3 — NOR GATE -->
+<div class="exp-card" data-tags="perceptron gate" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c3">EX 03</span>
+    <h2>Perceptron for NOR Gate</h2>
+    <span class="tag c3">Perceptron</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🔇</span> A silence alarm that rings <strong>only when everything is quiet (both inputs = 0)</strong>. As soon as any input becomes active, the alarm stops.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Note:</strong> The lab file uses y = [0,0,0,1] which is actually AND. NOR should be y = [1,0,0,0]. This might be a typo in the lab document.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>For TRUE NOR:</strong> Target y=[1,0,0,0] means output is 1 ONLY when both inputs are 0. Weights learn to be negative — penalizing any active input.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Flow is identical</strong> to AND/OR — only the y array determines what logic is learned.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input (NOR)</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>[0, 0]</td><td>No active input → passes threshold (NOR = true)</td><td>1 ✅</td></tr>
+        <tr><td>[0, 1]</td><td>One input fires → NOR = false</td><td>0 ✅</td></tr>
+        <tr><td>[1, 0]</td><td>One input fires → NOR = false</td><td>0 ✅</td></tr>
+        <tr><td>[1, 1]</td><td>Both fire → NOR = false</td><td>0 ✅</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"NOR is the complement of OR. The perceptron learns negative weights so that any active input pushes the sum below the threshold."</div>
+  </div>
+</div>
+
+<!-- EX 4 — XOR GATE -->
+<div class="exp-card" data-tags="perceptron gate network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c4">EX 04</span>
+    <h2>Perceptron for XOR Gate</h2>
+    <span class="tag c4">Multi-Layer</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">💡</span> A light that turns ON only when <strong>exactly one switch is flipped</strong>. Flip both or neither → light stays off. This is like a "disagreement detector."</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Why XOR is Special</div>
+      <div class="analogy-box" style="background:rgba(255,107,107,0.06);border-color:rgba(255,107,107,0.2);color:#e0a0a0;">
+        <strong>⚠️ XOR is NOT linearly separable!</strong><br>
+        You CANNOT draw one straight line to separate the 1s from 0s in XOR. That's why a single perceptron FAILS for XOR. We need 2 layers (hidden + output).
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Hidden Layer (2 neurons):</strong> Each neuron looks at the input differently. Neuron 1 acts like "at least one is 1" (OR-like). Neuron 2 acts like "both are 1" (AND-like).</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>For each input, compute h1 and h2</strong> using fixed weights. These are hand-crafted weights (not learned in this program).</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Output Layer:</strong> Takes [h1, h2] and computes: h1 AND (NOT h2) = XOR. Uses step function on the final result.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input</th><th>h1</th><th>h2</th><th>Final Output</th></tr>
+        <tr><td>[0, 0]</td><td>0</td><td>0</td><td>0 ✅</td></tr>
+        <tr><td>[0, 1]</td><td>1</td><td>0</td><td>1 ✅</td></tr>
+        <tr><td>[1, 0]</td><td>1</td><td>0</td><td>1 ✅</td></tr>
+        <tr><td>[1, 1]</td><td>1</td><td>1</td><td>0 ✅</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"XOR cannot be solved by a single-layer perceptron because it's not linearly separable. A 2-layer network with a hidden layer decomposes XOR into OR and AND sub-problems."</div>
+  </div>
+</div>
+
+<!-- EX 5 — LINEAR SEPARABLE -->
+<div class="exp-card" data-tags="perceptron network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c5">EX 05</span>
+    <h2>Linearly Separable Data</h2>
+    <span class="tag c5">Visualization</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🗺️</span> Imagine two groups of people standing in a park. <strong>Group A clusters near the fountain, Group B clusters near the trees.</strong> A linearly separable dataset means you can draw one straight path between them.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Create 2 clusters:</strong> Class 0 points near (1,1). Class 1 points near (5,5). They're far apart so a line can separate them.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Train perceptron:</strong> Same weight update rule. Runs 100 times to find the best separating line.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Convert weights to line equation:</strong> w[0]*x + w[1]*y + b = 0 → solve for y to plot the line.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Plot:</strong> Blue dots = Class 0, Red dots = Class 1, Green line = decision boundary.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Scenario</th><th>What changes</th><th>Result</th></tr>
+        <tr><td>Move groups closer together</td><td>c0 near (3,3), c1 near (4,4)</td><td>Line still found but less confident, may misclassify</td></tr>
+        <tr><td>Overlap the groups</td><td>c0 = [[2,2],[3,2]], c1 = [[2,3],[3,3]]</td><td>NOT linearly separable — line will be wrong for some points</td></tr>
+        <tr><td>Add more points per group</td><td>More training data</td><td>More robust line, better learned weights</td></tr>
+        <tr><td>Change learning_rate to 0.5</td><td>Weights update faster</td><td>Converges quicker but may overshoot</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Linearly separable data means a single straight line can perfectly classify all points. The perceptron algorithm is guaranteed to converge for linearly separable data."</div>
+  </div>
+</div>
+
+<!-- EX 6 — HEBB -->
+<div class="exp-card" data-tags="network memory" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c1">EX 06</span>
+    <h2>Hebb Network</h2>
+    <span class="tag c1">Unsupervised</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🧠</span> "Neurons that fire together, wire together." Like when you always hear thunder after lightning — your brain <strong>automatically links</strong> the two. No teacher needed — just repetition.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Input:</strong> X uses +1 and -1 (bipolar). y is the desired output (+1 or -1). This is bipolar instead of binary (0,1).</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Learning (one pass only):</strong> For each row, weight += X[i] × y[i]. No training loop needed — Hebb adds up all contributions directly.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>No error correction:</strong> Unlike perceptron, Hebb never checks if it was right or wrong. It just blindly adds.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Test:</strong> net = dot(X[i], weights) + bias. If net > 0 → output 1, else -1.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input (bipolar)</th><th>What happens</th><th>Output</th></tr>
+        <tr><td>[1, 1] → target 1</td><td>Both positive, product positive → weights increase</td><td>+1</td></tr>
+        <tr><td>[1, -1] → target -1</td><td>Input mixed, target neg → weights pulled negative</td><td>-1</td></tr>
+        <tr><td>Change to binary (0,1)</td><td>Rows with 0 contribute nothing. Less learning signal</td><td>May not converge well</td></tr>
+        <tr><td>Add conflicting patterns</td><td>Weights get pulled in opposite directions → confusion</td><td>Incorrect outputs</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Hebb's rule is unsupervised — there is no error calculation. Weights are updated as the outer product of input and output, accumulating associations over all training patterns."</div>
+  </div>
+</div>
+
+<!-- EX 7 — HOPFIELD -->
+<div class="exp-card" data-tags="memory network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c2">EX 07</span>
+    <h2>Hopfield Network</h2>
+    <span class="tag c2">Associative Memory</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">📷</span> Like recognizing a <strong>blurry, half-torn photo</strong> of your friend. Your brain fills in the missing parts from memory. Hopfield networks do the same — given a noisy pattern, they recall the original stored one.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Store patterns:</strong> Two patterns are stored in a weight matrix using: W += outer(p, p). This is the "memory".</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Remove self-connections:</strong> fill_diagonal(W, 0). A neuron shouldn't influence itself.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Give noisy test input:</strong> [1, -1, -1, -1] (slightly corrupted from stored pattern [1,-1,1,-1]).</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Iterative update:</strong> Each neuron votes based on its neighbors. After 5 rounds, the pattern stabilizes (converges) to the nearest stored memory.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Test Input</th><th>What Happens</th><th>Output</th></tr>
+        <tr><td>[1,-1,1,-1] (exact)</td><td>Already matches stored pattern → no change needed</td><td>[1,-1,1,-1] ✅</td></tr>
+        <tr><td>[1,-1,-1,-1] (1 bit flip)</td><td>Network corrects flipped bit through iterations</td><td>[1,-1,1,-1] ✅</td></tr>
+        <tr><td>[1,1,1,1] (heavy noise)</td><td>Too far from any stored pattern → may give wrong result</td><td>Unpredictable ⚠️</td></tr>
+        <tr><td>Store 3 patterns (too many)</td><td>Capacity exceeded → spurious (fake) memories appear</td><td>Wrong recall ⚠️</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Hopfield network is a recurrent network that stores patterns as stable states. It retrieves the closest stored pattern from a noisy input by minimizing an energy function."</div>
+  </div>
+</div>
+
+<!-- EX 8 — AUTO ASSOCIATIVE -->
+<div class="exp-card" data-tags="memory network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c3">EX 08</span>
+    <h2>Auto Associative Memory</h2>
+    <span class="tag c3">Memory</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🪞</span> Like a mirror that shows you your <strong>perfect, clean face</strong> even if you walk in with mud on it. Input = dirty pattern, Output = clean original.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Store patterns:</strong> 5-element bipolar patterns. W += outer(p, p). Diagonal set to 0.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Give noisy input:</strong> [1,-1,1,<strong>1</strong>,1] — 4th element is flipped (original was -1).</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Iterate 10 times:</strong> Each neuron recalculates using W[i] · state. Gradually corrects to stored pattern.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Result:</strong> Noisy input → recalled clean output (same type, hence "auto").</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Noisy Input</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>1 bit flipped</td><td>Easily corrected in a few iterations</td><td>Original ✅</td></tr>
+        <tr><td>2 bits flipped</td><td>May or may not correct depending on pattern</td><td>Likely original ⚠️</td></tr>
+        <tr><td>Completely random</td><td>Falls into wrong stable state (spurious memory)</td><td>Wrong ❌</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Auto associative memory maps a noisy version of a pattern back to itself. Input and output are from the same space, unlike hetero associative memory."</div>
+  </div>
+</div>
+
+<!-- EX 9 — HETERO ASSOCIATIVE -->
+<div class="exp-card" data-tags="memory network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c4">EX 09</span>
+    <h2>Hetero Associative Memory</h2>
+    <span class="tag c4">Memory</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">📖</span> Like a <strong>two-language dictionary</strong>. You input a word in Tamil → get back the English meaning. Input and output are completely different things.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Define pairs:</strong> X (3-element input patterns) and Y (4-element output patterns). These are the "dictionary entries."</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Build weight matrix W:</strong> W (4×3 matrix) = sum of outer(Y[i], X[i]). Shape is different from auto-associative because input/output sizes differ.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Recall:</strong> Given test_input (3-element), compute W · test_input. Apply sign function to get the recalled Y pattern.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input Pattern</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>[1,-1,1] (exact)</td><td>Direct lookup → perfect match</td><td>[1,1,-1,-1] ✅</td></tr>
+        <tr><td>[-1,1,-1] (exact)</td><td>Second stored pair recalled perfectly</td><td>[-1,-1,1,1] ✅</td></tr>
+        <tr><td>[1,1,1] (unseen)</td><td>Closest match wins → may give partial recall</td><td>Approximate</td></tr>
+        <tr><td>[0,0,0]</td><td>No signal → all zeros → sign(0) edge case</td><td>Unpredictable</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Hetero associative memory learns a mapping between two different pattern spaces. The weight matrix W = Σ outer(Y, X) stores all input-output pairs."</div>
+  </div>
+</div>
+
+<!-- EX 10 — ADALINE -->
+<div class="exp-card" data-tags="network perceptron" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c5">EX 10</span>
+    <h2>ADALINE</h2>
+    <span class="tag c5">Gradient Learning</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🎯</span> Imagine adjusting the aim of a dart. A perceptron only cares if you hit or missed. ADALINE also cares <strong>by HOW MUCH</strong> you missed — and corrects proportionally. More precise!</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Key difference from Perceptron:</strong> ADALINE uses the raw linear output (no step function) to calculate error during training. It minimizes MSE (mean square error).</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Forward pass:</strong> y_pred = X · w + b. No step function during training — raw decimal values.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Update:</strong> w += lr × X.T · (y - y_pred). All inputs updated at once (batch learning). More stable than perceptron.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Plot:</strong> Decision boundary line drawn. Points colored by class label.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>Increase epochs (20→100)</td><td>Weights converge more accurately, better boundary</td></tr>
+        <tr><td>Increase learning rate (0.1→0.9)</td><td>Overshoots, weights oscillate, may not converge</td></tr>
+        <tr><td>Change to OR gate (y=[0,1,1,1])</td><td>Line shifts position — different boundary for OR</td></tr>
+        <tr><td>Use XOR data</td><td>No single line can separate — ADALINE will fail</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"ADALINE uses the Widrow-Hoff (LMS) learning rule. Unlike the perceptron, it uses the continuous output — not the thresholded output — to calculate the error during weight updates."</div>
+  </div>
+</div>
+
+<!-- EX 11 — MADALINE -->
+<div class="exp-card" data-tags="network perceptron" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c1">EX 11</span>
+    <h2>MADALINE</h2>
+    <span class="tag c1">Multi-ADALINE</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">👥</span> Like having <strong>two expert judges</strong>, each viewing the problem from a different angle, and a <strong>final judge</strong> who combines their opinions. More powerful than one judge alone.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>XOR problem:</strong> y = [-1,1,1,-1]. Can't solve with single ADALINE. Need 2 hidden neurons.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Hidden layer:</strong> 2 neurons with random initial weights W. Each computes sign(X·W[i] + b[i]).</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Output layer:</strong> Takes [h1, h2] and computes final output using weights V.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Only output layer is updated:</strong> If output is wrong, V and bo are adjusted. Hidden weights W are FIXED. This is the MADALINE rule (MRI).</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>Change target to AND [-1,-1,-1,1]</td><td>Network solves it easily — simpler problem</td></tr>
+        <tr><td>Increase epochs (100→500)</td><td>More training → better chance of convergence for XOR</td></tr>
+        <tr><td>Change random seed</td><td>Different initial W → may converge or fail (randomness)</td></tr>
+        <tr><td>Add 3rd hidden neuron</td><td>More capacity → solves complex problems better</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"MADALINE uses multiple ADALINEs in the hidden layer. Using the MRI rule, only the output layer weights are updated when the output is incorrect."</div>
+  </div>
+</div>
+
+<!-- EX 12 — BAM -->
+<div class="exp-card" data-tags="memory network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c2">EX 12</span>
+    <h2>Bidirectional Associative Memory (BAM)</h2>
+    <span class="tag c2">Memory</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🔄</span> Like a <strong>two-way street</strong>. If you see a face (X), you remember the name (Y). If you hear the name (Y), you picture the face (X). Works both directions.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Store pairs:</strong> X (3-element) paired with Y (2-element). W = sum of outer(X[i], Y[i]). Shape: 3×2.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Forward (X→Y):</strong> y_out = sign(test_x · W). Multiply X by W to get Y.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Backward (Y→X):</strong> x_out = sign(y_out · W.T). Multiply Y by W-transpose to recover X.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Verify:</strong> Recalled X should match original test_x. This proves the bidirectional nature.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Input</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>[1,-1,1] (stored pattern)</td><td>Exact match → W gives perfect Y; W.T gives back X</td><td>[1,-1] then [1,-1,1] ✅</td></tr>
+        <tr><td>[-1,1,-1] (second pattern)</td><td>Retrieves its associated Y pattern</td><td>[-1,1] ✅</td></tr>
+        <tr><td>[1,1,-1] (unseen)</td><td>Closest pattern wins → approximate recall</td><td>Nearest stored</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"BAM is a two-layer recurrent network. W = Σ outer(X,Y) stores associations. Forward pass X→Y uses W, backward pass Y→X uses W transpose."</div>
+  </div>
+</div>
+
+<!-- EX 13 — DISCRETE HOPFIELD -->
+<div class="exp-card" data-tags="memory network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c3">EX 13</span>
+    <h2>Discrete Hopfield Network</h2>
+    <span class="tag c3">Memory</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🧩</span> Like completing a <strong>jigsaw puzzle</strong>. Even if half the pieces are in the wrong place, the picture eventually snaps into the correct stored configuration.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Same as EX 7</strong> but tests with an EXACT stored pattern (not noisy).</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Weight matrix built:</strong> W = Σ outer(p,p), diagonal set to 0. Stores 2 patterns.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Test with [1,-1,1,-1]:</strong> This is exactly pattern 1. Network should immediately confirm it without any changes.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Discrete update:</strong> Each neuron updated one at a time (asynchronous). net > 0 → +1, net < 0 → -1, else unchanged.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Test Input</th><th>Behavior</th><th>Output</th></tr>
+        <tr><td>[1,-1,1,-1] (pattern 1)</td><td>Already stable → no update needed</td><td>[1,-1,1,-1] ✅</td></tr>
+        <tr><td>[-1,1,-1,1] (pattern 2)</td><td>Already stable → no update needed</td><td>[-1,1,-1,1] ✅</td></tr>
+        <tr><td>[1,1,1,1] (mixed)</td><td>Not a stable state → iterates and lands on nearest pattern</td><td>Nearest stored ⚠️</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Discrete Hopfield uses bipolar (+1/-1) values and asynchronous neuron updates. Stored patterns are energy minima — the network naturally settles into them."</div>
+  </div>
+</div>
+
+<!-- EX 14 — BACKPROP -->
+<div class="exp-card" data-tags="network perceptron" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c4">EX 14</span>
+    <h2>Back Propagation Network</h2>
+    <span class="tag c4">Deep Learning</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🎓</span> Like a student who gets exam results, figures out <strong>exactly where they went wrong</strong> in each step, and corrects each step working backwards from the final mistake.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Setup:</strong> XOR dataset. Two weight matrices W1 (input→hidden, 2×2) and W2 (hidden→output, 2×1). Both initialized randomly.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Forward pass:</strong> h = sigmoid(X · W1), o = sigmoid(h · W2). Sigmoid squishes output between 0 and 1 smoothly.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Calculate error:</strong> error = y - o. How far off is the output?</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Backward pass:</strong> d_o = error × sigmoid'(o). Then d_h = (d_o · W2.T) × sigmoid'(h). Error travels backwards through layers.</div></div>
+        <div class="flow-step"><div class="step-dot dot5">5</div><div class="step-content"><strong>Update weights:</strong> W2 += lr × h.T · d_o. W1 += lr × X.T · d_h. Repeat 5000 times.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>Reduce epochs (5000→100)</td><td>Under-trained → wrong predictions for XOR</td></tr>
+        <tr><td>Change lr=0.5 → lr=2.0</td><td>Overshoots gradients → weights explode, NaN errors</td></tr>
+        <tr><td>Add 3rd hidden neuron (2→3)</td><td>More capacity → faster convergence</td></tr>
+        <tr><td>Change XOR to AND data</td><td>Converges much faster since AND is simpler</td></tr>
+        <tr><td>Different random W1, W2</td><td>May reach different final weights but same correct output</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Backpropagation calculates the gradient of the error with respect to each weight using the chain rule. It propagates the error backward from output to input layer to update all weights."</div>
+  </div>
+</div>
+
+<!-- EX 15 — ART -->
+<div class="exp-card" data-tags="network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c5">EX 15</span>
+    <h2>Adaptive Resonance Theory (ART)</h2>
+    <span class="tag c5">Unsupervised</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🗂️</span> Like a student creating <strong>new folders</strong> for each type of subject. If a new topic is similar enough to an existing folder — add it there. If it's too different — make a new folder. And old folders are never erased!</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Vigilance = 0.6:</strong> This is the "strictness" threshold. Higher = more clusters. Lower = fewer, larger clusters.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>For each new input:</strong> Check similarity with each existing cluster weight using: match = sum(min(x, w)) / sum(x).</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>If match ≥ vigilance:</strong> Assign input to that cluster. Update cluster weight: w = min(x, w).</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>If no match found:</strong> Create a brand new cluster for this input. No forgetting of old clusters!</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>vigilance = 0.9 (high)</td><td>Very strict matching → more clusters created</td></tr>
+        <tr><td>vigilance = 0.2 (low)</td><td>Everything grouped together → fewer clusters</td></tr>
+        <tr><td>Add very different pattern [1,1,0,0]</td><td>New cluster created (doesn't match any existing)</td></tr>
+        <tr><td>Add identical pattern twice</td><td>Goes to same cluster, weight unchanged (already matched)</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"ART solves the stability-plasticity dilemma. The vigilance parameter controls cluster granularity. New patterns that don't match existing clusters create new ones, preserving old memories."</div>
+  </div>
+</div>
+
+<!-- EX 16 — MEMBERSHIP -->
+<div class="exp-card" data-tags="fuzzy" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c1">EX 16</span>
+    <h2>Membership Value Assignment Methods</h2>
+    <span class="tag c1">Fuzzy Logic</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🌡️</span> "Is 28°C HOT?" In regular logic: yes or no. In fuzzy logic: <strong>"28°C is 0.7 hot and 0.3 warm."</strong> The membership function tells you the degree of truth.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow — 4 Membership Shapes</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">🔺</div><div class="step-content"><strong>Triangular:</strong> Rises linearly to 1 at peak, falls back to 0. Simple tent shape. Used when there's one clear "center" value.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">🔷</div><div class="step-content"><strong>Trapezoidal:</strong> Like triangular but flat on top — a range of values all get membership = 1. Used when a range is acceptable.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">🔔</div><div class="step-content"><strong>Gaussian:</strong> Bell curve. Smooth, gradual transitions. Very natural-looking. Used in temperature, pressure controls.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">📈</div><div class="step-content"><strong>Sigmoid:</strong> S-curve. Gradually rises from 0 to 1. Used when there's a gradual transition (e.g., "becoming hot").</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>x value</th><th>Triangular(x)</th><th>Gaussian(x)</th><th>Sigmoid(x)</th></tr>
+        <tr><td>x = 0 (peak)</td><td>1.0 (maximum)</td><td>1.0 (maximum)</td><td>0.5 (midpoint)</td></tr>
+        <tr><td>x = 3 (edge)</td><td>0.0 (boundary)</td><td>~0.01 (near 0)</td><td>~0.98 (near 1)</td></tr>
+        <tr><td>x = -5</td><td>0.0 (outside)</td><td>~0.00003</td><td>~0.08</td></tr>
+        <tr><td>Change peak b=5→b=0</td><td>Triangle shifts left</td><td>Gaussian shifts left</td><td>Sigmoid shifts</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Membership functions define how each input value maps to a degree of membership between 0 and 1. Different shapes suit different real-world scenarios — triangular for sharp transitions, Gaussian for natural gradations."</div>
+  </div>
+</div>
+
+<!-- EX 17 — COUNTER PROP -->
+<div class="exp-card" data-tags="network" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c2">EX 17</span>
+    <h2>Counter Propagation Network</h2>
+    <span class="tag c2">Competitive</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🏆</span> Imagine a competition where employees bid on tasks. The <strong>most suitable employee (winner)</strong> takes the task and learns from it. The winner adjusts to become even better for similar future tasks.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Kohonen (competitive) layer:</strong> 2 neurons with random weights k. For each input, find the closest neuron using Euclidean distance.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Winner takes all:</strong> winner = argmin(distance). Only the winner neuron gets to update.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Update Kohonen weights:</strong> k[winner] += lr × (x - k[winner]). Moves the winner closer to the current input.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Update Grossberg (output) weights:</strong> g[winner] += lr × (t - g[winner]). Moves output weight toward the target value.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>epochs 500 → 100</td><td>Less training → inaccurate outputs</td></tr>
+        <tr><td>learning_rate 0.1 → 0.5</td><td>Faster learning but may overshoot</td></tr>
+        <tr><td>3 Kohonen neurons (k=3)</td><td>More clusters → finer mapping but slower</td></tr>
+        <tr><td>Different random seed</td><td>Different winner assignments → may or may not converge</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Counter propagation uses competitive learning in the Kohonen layer to find the best matching neuron, then the Grossberg layer adapts the output toward the target."</div>
+  </div>
+</div>
+
+<!-- EX 18 — CLASSICAL/FUZZY SETS -->
+<div class="exp-card" data-tags="fuzzy" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c3">EX 18</span>
+    <h2>Classical Set vs Fuzzy Set Relations</h2>
+    <span class="tag c3">Fuzzy Logic</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🎨</span> Classical set: "You are either IN the tall people group or NOT." Fuzzy set: <strong>"You are 0.8 tall and 0.3 medium."</strong> Real life rarely has sharp boundaries.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Classical Cartesian Product:</strong> All possible pairs from A×B. {(1,2),(1,3),(1,4),(2,2),...}. Every combo listed.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Classical Relation:</strong> Only pairs where a == b. {(2,2),(3,3)} — strict equality.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Fuzzy Sets defined:</strong> fuzzy_A = {1:0.2, 2:0.5, 3:0.8}. Each element has a degree of membership.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Fuzzy Relation:</strong> For each pair (a,b), degree = min(membership_A, membership_B). Captures partial association.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>A=[1,2], B=[3,4] (no overlap)</td><td>Classical relation = [] (empty — no equal pairs)</td></tr>
+        <tr><td>fuzzy_A = {1:1.0, 2:1.0}</td><td>All membership = 1. Fuzzy relation becomes same as classical</td></tr>
+        <tr><td>Use max instead of min for fuzzy</td><td>Changes to fuzzy union relation (different semantics)</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Classical sets use crisp boundaries — membership is 0 or 1. Fuzzy sets allow partial membership. The fuzzy relation between two sets uses the minimum of their membership values."</div>
+  </div>
+</div>
+
+<!-- EX 19 — TRIANGULAR MF -->
+<div class="exp-card" data-tags="fuzzy" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c4">EX 19</span>
+    <h2>Triangular Membership Function</h2>
+    <span class="tag c4">Fuzzy Logic</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">⛰️</span> Like defining "medium height" — heights below 5 ft are 0% medium, 5.5 ft is <strong>100% medium</strong>, and 6 ft is again 0% medium. A mountain peak of membership.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Parameters:</strong> a=2 (start), b=5 (peak), c=8 (end). The triangle lives between 2 and 8, peaking at 5.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Left slope:</strong> For x between a and b: membership = (x-a)/(b-a). Rises from 0 to 1.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Right slope:</strong> For x between b and c: membership = (c-x)/(c-b). Falls from 1 to 0.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Outside:</strong> membership = 0. The np.maximum(np.minimum(...), 0) ensures values stay in [0,1].</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>x value</th><th>Calculation</th><th>Membership</th></tr>
+        <tr><td>x = 2 (start)</td><td>(2-2)/(5-2) = 0</td><td>0.0</td></tr>
+        <tr><td>x = 3.5 (midpoint left)</td><td>(3.5-2)/(5-2) = 0.5</td><td>0.5</td></tr>
+        <tr><td>x = 5 (peak)</td><td>Both formulas give 1</td><td>1.0</td></tr>
+        <tr><td>x = 8 (end)</td><td>(8-8)/(8-5) = 0</td><td>0.0</td></tr>
+        <tr><td>Change b=5 to b=2 (sharp left)</td><td>Triangle becomes right-leaning</td><td>Shifts shape</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"The triangular membership function is defined by three points (a, b, c). It rises linearly from a to b and falls from b to c, reaching maximum membership of 1 only at b."</div>
+  </div>
+</div>
+
+<!-- EX 20 — FUZZY TSP -->
+<div class="exp-card" data-tags="fuzzy" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c5">EX 20</span>
+    <h2>Fuzzy Travelling Salesman Problem</h2>
+    <span class="tag c5">Fuzzy Logic</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">🚗</span> A delivery driver visiting 4 cities wants the <strong>shortest total route</strong>. But the distances aren't exact — traffic varies, so each distance is a range like "10 to 14 km." Fuzzy TSP handles this uncertainty.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Fuzzy distances:</strong> Each road is a triangular fuzzy number (min, mid, max). E.g., city 0→1: (10,12,14) means "somewhere between 10 and 14."</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Defuzzification:</strong> Convert each fuzzy distance to one crisp number: (min+mid+max)/3. E.g., (10+12+14)/3 = 12.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Try all permutations:</strong> 3! = 6 possible routes (excluding start city 0). Calculate total cost for each.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Pick best:</strong> Route with minimum total defuzzified cost wins. Print it.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Effect</th></tr>
+        <tr><td>Change (0,1) to (1,2,3)</td><td>Route 0→1 becomes cheapest → shorter best path</td></tr>
+        <tr><td>Add city 4 (more cities)</td><td>4! = 24 permutations → same logic, more routes checked</td></tr>
+        <tr><td>Use max instead of avg for defuzz</td><td>Pessimistic estimate → may choose different best path</td></tr>
+        <tr><td>Equal distances all around</td><td>Multiple routes tie for minimum cost</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Fuzzy TSP handles uncertain distances using fuzzy numbers. Defuzzification (average method here) converts fuzzy distances to crisp values for comparison. All permutations are evaluated to find the minimum cost path."</div>
+  </div>
+</div>
+
+<!-- EX 21 — LAMBDA CUTS -->
+<div class="exp-card" data-tags="fuzzy" onclick="toggle(this)">
+  <div class="card-header">
+    <span class="exp-num c1">EX 21</span>
+    <h2>Lambda Cuts in Defuzzification</h2>
+    <span class="tag c1">Fuzzy Logic</span>
+    <span class="chevron">▼</span>
+  </div>
+  <div class="card-body">
+    <div class="section">
+      <div class="section-title">🍎 Real-Life Analogy</div>
+      <div class="analogy-box"><span class="emoji">✂️</span> Imagine a triangular mountain. Lambda cut is like taking a <strong>horizontal slice at a certain height</strong> (e.g., 60% up). The width of that slice gives you a range. The middle of that range is your crisp answer.</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📋 Program Flow (Step by Step)</div>
+      <div class="flow-steps">
+        <div class="flow-step"><div class="step-dot dot1">1</div><div class="step-content"><strong>Fuzzy number (2, 5, 8):</strong> Triangle starts at 2, peaks at 5, ends at 8.</div></div>
+        <div class="flow-step"><div class="step-dot dot2">2</div><div class="step-content"><strong>Lambda = 0.6:</strong> We want the portion where membership ≥ 0.6. Cut the triangle at height 0.6.</div></div>
+        <div class="flow-step"><div class="step-dot dot3">3</div><div class="step-content"><strong>Left boundary:</strong> left = a + λ(b-a) = 2 + 0.6×(5-2) = 2 + 1.8 = <strong>3.8</strong>.</div></div>
+        <div class="flow-step"><div class="step-dot dot4">4</div><div class="step-content"><strong>Right boundary:</strong> right = c - λ(c-b) = 8 - 0.6×(8-5) = 8 - 1.8 = <strong>6.2</strong>.</div></div>
+        <div class="flow-step"><div class="step-dot dot5">5</div><div class="step-content"><strong>Defuzzify:</strong> crisp = (3.8 + 6.2) / 2 = <strong>5.0</strong>. The answer! Turns out it's always the peak for symmetric triangles.</div></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔄 What Happens with Different Inputs</div>
+      <table class="diff-table">
+        <tr><th>Change</th><th>Left</th><th>Right</th><th>Crisp Value</th></tr>
+        <tr><td>λ = 0.0</td><td>2.0</td><td>8.0</td><td>5.0 (full range)</td></tr>
+        <tr><td>λ = 1.0</td><td>5.0</td><td>5.0</td><td>5.0 (just the peak)</td></tr>
+        <tr><td>λ = 0.5</td><td>3.5</td><td>6.5</td><td>5.0</td></tr>
+        <tr><td>Asymmetric: (2,4,8)</td><td>3.2</td><td>6.4</td><td>4.8 (shifted left)</td></tr>
+      </table>
+    </div>
+    <div class="key-term"><strong>🎓 Say to Examiner</strong>"Alpha-cut (lambda-cut) slices a fuzzy set horizontally at level λ, producing a crisp interval. Defuzzification takes the mean of this interval. For symmetric triangles, the result always equals the peak value."</div>
+  </div>
+</div>
+
+<div class="no-results" id="noResults" style="display:none">
+  😕 No experiments found matching your search.
+</div>
+
+</main>
+
+<script>
+function toggle(card) {
+  // Don't toggle if clicking inside the body
+  const isOpen = card.classList.contains('open');
+  card.classList.toggle('open', !isOpen);
+}
+
+function filter(tag, btn) {
+  document.querySelectorAll('.badge').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.exp-card');
+  cards.forEach(card => {
+    if (tag === 'all') {
+      card.style.display = '';
+    } else {
+      const tags = card.getAttribute('data-tags') || '';
+      card.style.display = tags.includes(tag) ? '' : 'none';
+    }
+  });
+  checkEmpty();
+}
+
+function searchCards() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('.exp-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? '' : 'none';
+  });
+  checkEmpty();
+}
+
+function checkEmpty() {
+  const visible = [...document.querySelectorAll('.exp-card')].filter(c => c.style.display !== 'none');
+  document.getElementById('noResults').style.display = visible.length === 0 ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
